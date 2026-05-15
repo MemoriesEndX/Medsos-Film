@@ -15,7 +15,7 @@ export default function GoogleLoginButton() {
 
     try {
       await signIn("google", {
-        callbackUrl: "/creator",
+        callbackUrl: "/auth/role-redirect",
       });
     } finally {
       setIsLoading(false);

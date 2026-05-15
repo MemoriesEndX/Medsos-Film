@@ -8,18 +8,7 @@ import { motion } from "framer-motion";
 import { Camera, Clapperboard, Film, Sparkles, Ticket } from "lucide-react";
 
 import GoogleLoginButton from "@/components/login/GoogleLoginButton";
-
-function getRedirectPath(role: string, username: string): string {
-  if (role === "USER") {
-    return "/";
-  }
-
-  if (role === "ADMIN") {
-    return "/dashboard/admin";
-  }
-
-  return `/creator/${username}`;
-}
+import { getRedirectPathByRole } from "@/src/lib/auth/redirect-by-role";
 
 export default function LoginCard() {
   const router = useRouter();
@@ -50,9 +39,8 @@ export default function LoginCard() {
 
       const session = await getSession();
       const role = session?.user?.role ?? "USER";
-      const username = session?.user?.username ?? "";
 
-      router.replace(getRedirectPath(role, username));
+      router.replace(getRedirectPathByRole(role));
       router.refresh();
     } finally {
       setIsSubmitting(false);
