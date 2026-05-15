@@ -5,7 +5,6 @@ import {
   Clapperboard,
   Users,
   Edit3,
-  Music,
   Camera,
   Building2,
   Eye,

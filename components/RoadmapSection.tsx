@@ -3,11 +3,8 @@
 import { motion, type Variants } from 'framer-motion';
 import {
   Rocket,
-  Users,
   Star,
-  Award,
   TrendingUp,
-  Zap,
 } from 'lucide-react';
 
 const containerVariants = {

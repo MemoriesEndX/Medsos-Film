@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider, { type GoogleProfile } from "next-auth/providers/google";
 import { z } from "zod";
 
+import { generateUniqueUsername } from "@/src/lib/auth/generate-unique-username";
 import prisma from "@/src/lib/prisma";
 
 const credentialsSchema = z.object({
@@ -76,12 +77,21 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        const username = user.username ?? (await generateUniqueUsername(prisma, user.name ?? user.email));
+
+        if (!user.username) {
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { username },
+          });
+        }
+
         return {
           id: user.id,
           name: user.name ?? user.username ?? user.email,
           email: user.email,
           image: user.image,
-          username: user.username ?? undefined,
+          username,
           role: user.role,
           accountType: user.accountType,
           professionRole: user.professionRole,
@@ -99,19 +109,22 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
 
+      const googleProfile = profile as Partial<GoogleProfile> | undefined;
+      const googleName = googleProfile?.name ?? user.name ?? null;
+      const googleImage = googleProfile?.picture ?? user.image ?? null;
+      const usernameInput = googleName ?? user.email.split("@")[0] ?? user.email;
       const existingUser = await prisma.user.findUnique({
         where: { email: user.email },
         select: {
+          id: true,
           name: true,
           image: true,
+          username: true,
         },
       });
 
       if (existingUser) {
-        const googleProfile = profile as Partial<GoogleProfile> | undefined;
-        const updateData: { name?: string; image?: string } = {};
-        const googleName = googleProfile?.name ?? user.name;
-        const googleImage = googleProfile?.picture ?? user.image;
+        const updateData: { name?: string; image?: string; username?: string } = {};
 
         if (!existingUser.name && googleName) {
           updateData.name = googleName;
@@ -121,12 +134,26 @@ export const authOptions: NextAuthOptions = {
           updateData.image = googleImage;
         }
 
+        if (!existingUser.username) {
+          updateData.username = await generateUniqueUsername(prisma, usernameInput);
+        }
+
         if (Object.keys(updateData).length > 0) {
           await prisma.user.update({
             where: { email: user.email },
             data: updateData,
           });
         }
+      } else {
+        await prisma.user.create({
+          data: {
+            email: user.email,
+            name: googleName,
+            image: googleImage,
+            username: await generateUniqueUsername(prisma, usernameInput),
+            password: null,
+          },
+        });
       }
 
       return true;
