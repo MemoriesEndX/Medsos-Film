@@ -7,7 +7,7 @@ import { type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 import { toggleVariants } from '@/components/ui/toggle'
 
-const ToggleGroupContext = React.creatcinemantext<
+const ToggleGroupContext = React.createContext<
   VariantProps<typeof toggleVariants>
 >({
   size: 'default',
@@ -48,7 +48,7 @@ function ToggleGroupItem({
   ...props
 }: React.ComponentProps<typeof ToggleGroupPrimitive.Item> &
   VariantProps<typeof toggleVariants>) {
-  const context = React.uscinemantext(ToggleGroupContext)
+  const context = React.useContext(ToggleGroupContext)
 
   return (
     <ToggleGroupPrimitive.Item

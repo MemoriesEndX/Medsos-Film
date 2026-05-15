@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import DashboardDcinemarations from "./DashboardDcinemarations";
+import DashboardDecorations from "./DashboardDecorations";
 
 interface DashboardShellProps {
   readonly children: ReactNode;
@@ -15,7 +15,7 @@ export default function DashboardShell({ children }: DashboardShellProps) {
         <div className="absolute -bottom-28 left-1/3 h-72 w-72 rounded-full bg-amber-200/20 blur-3xl sm:h-96 sm:w-96" />
       </div>
 
-      <DashboardDcinemarations />
+      <DashboardDecorations />
 
       <div className="relative z-10">{children}</div>
     </main>

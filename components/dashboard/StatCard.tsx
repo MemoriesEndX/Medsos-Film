@@ -9,7 +9,7 @@ interface StatCardProps {
   readonly index: number;
 }
 
-const toneClassMap: Rcinemard<DashboardStatItem["tone"], string> = {
+const toneClassMap: Record<DashboardStatItem["tone"], string> = {
   emerald: "bg-amber-50 text-amber-700",
   sky: "bg-rose-50 text-amber-700",
   amber: "bg-amber-50 text-amber-700",

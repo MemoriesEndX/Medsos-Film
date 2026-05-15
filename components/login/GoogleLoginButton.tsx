@@ -15,7 +15,7 @@ export default function GoogleLoginButton() {
 
     try {
       await signIn("google", {
-        callbackUrl: "/dashboard",
+        callbackUrl: "/creator",
       });
     } finally {
       setIsLoading(false);

@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { Clapperboard, Film, Camera, Sparkles } from 'lucide-react';
 
 const containerVariants = {
@@ -16,17 +16,17 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
 };
 
-const floatingVariants = {
+const floatingVariants: Variants = {
   animate: (index: number) => ({
     y: [0, -12 + index * 3, 0],
     rotate: [0, 2, 0],
     transition: {
       duration: 5 + index * 0.3,
       repeat: Infinity,
-      ease: 'easeInOut',
+      ease: 'easeInOut' as const,
     },
   }),
 };

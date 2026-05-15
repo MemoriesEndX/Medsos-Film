@@ -19,15 +19,15 @@ function CollapsibleTrigger({
   )
 }
 
-function Collapsiblcinemantent({
+function CollapsibleContent({
   ...props
-}: React.ComponentProps<typeof CollapsiblePrimitive.Collapsiblcinemantent>) {
+}: React.ComponentProps<typeof CollapsiblePrimitive.CollapsibleContent>) {
   return (
-    <CollapsiblePrimitive.Collapsiblcinemantent
+    <CollapsiblePrimitive.CollapsibleContent
       data-slot="collapsible-content"
       {...props}
     />
   )
 }
 
-export { Collapsible, CollapsibleTrigger, Collapsiblcinemantent }
+export { Collapsible, CollapsibleTrigger, CollapsibleContent }

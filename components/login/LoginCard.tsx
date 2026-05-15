@@ -3,11 +3,23 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { getSession, signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Camera, Clapperboard, Film, Sparkles, Ticket } from "lucide-react";
 
 import GoogleLoginButton from "@/components/login/GoogleLoginButton";
+
+function getRedirectPath(role: string, username: string): string {
+  if (role === "USER") {
+    return "/";
+  }
+
+  if (role === "ADMIN") {
+    return "/dashboard/admin";
+  }
+
+  return `/creator/${username}`;
+}
 
 export default function LoginCard() {
   const router = useRouter();
@@ -29,7 +41,6 @@ export default function LoginCard() {
         email,
         password,
         redirect: false,
-        callbackUrl: "/dashboard",
       });
 
       if (result?.error) {
@@ -37,7 +48,11 @@ export default function LoginCard() {
         return;
       }
 
-      router.replace(result?.url ?? "/dashboard");
+      const session = await getSession();
+      const role = session?.user?.role ?? "USER";
+      const username = session?.user?.username ?? "";
+
+      router.replace(getRedirectPath(role, username));
       router.refresh();
     } finally {
       setIsSubmitting(false);
@@ -140,17 +155,15 @@ export default function LoginCard() {
           </motion.button>
         </form>
 
+        <div className="my-5 flex items-center gap-3 text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+          <span className="h-px flex-1 bg-white/10" />
+          atau
+          <span className="h-px flex-1 bg-white/10" />
+        </div>
+
+        <GoogleLoginButton />
+
         {errorMessage ? <p className="mt-3 text-sm text-rose-300">{errorMessage}</p> : null}
-
-        <div className="my-6 flex items-center gap-3" aria-hidden="true">
-          <span className="h-px flex-1 bg-white/10" />
-          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">atau</span>
-          <span className="h-px flex-1 bg-white/10" />
-        </div>
-
-        <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-2">
-          <GoogleLoginButton />
-        </div>
 
         <footer className="mt-6 text-center text-sm text-white">
           <p>

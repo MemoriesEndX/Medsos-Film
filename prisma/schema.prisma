@@ -3,29 +3,66 @@
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
-generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
-}
-
 datasource db {
   provider = "postgresql"
 }
 
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+enum Role {
+  USER
+  CREATOR
+  COMPETITION_JUDGE
+  ADMIN
+}
+
+enum AccountType {
+  PERSONAL
+  STUDIO
+  ORGANIZED
+}
+
+enum ProfessionRole {
+  DIRECTOR
+  PRODUCER
+  SCREENWRITER
+  ACTOR
+  EDITOR
+  DOP
+  SOUND_DESIGNER
+  PRODUCTION_DESIGNER
+  OTHER
+}
+
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  age           Int?
-  password      String?
-  points        Int       @default(0)
-  level         Int       @default(1)
-  accounts      Account[]
-  sessions      Session[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id             String         @id @default(cuid())
+  name           String?
+  username       String?        @unique
+  email          String         @unique
+  password       String?
+  image          String?
+  emailVerified  DateTime?
+  role           Role           @default(USER)
+  accountType    AccountType    @default(PERSONAL)
+  professionRole ProfessionRole @default(OTHER)
+
+  gender      String?
+  birthDate   DateTime?
+  phoneNumber String?
+  address     String?
+  bio         String?
+  website     String?
+  profilePhoto String?
+  coverPhoto   String?
+
+  accounts Account[]
+  sessions Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Account {
@@ -34,12 +71,12 @@ model Account {
   type               String
   provider           String
   providerAccountId  String
-  refresh_token      String?
-  access_token       String?
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
   expires_at         Int?
   token_type         String?
   scope              String?
-  id_token           String?
+  id_token           String? @db.Text
   session_state      String?
   oauth_token_secret String?
   oauth_token        String?
@@ -63,5 +100,5 @@ model VerificationToken {
   token      String   @unique
   expires    DateTime
 
-  @@id([identifier, token])
+  @@unique([identifier, token])
 }
