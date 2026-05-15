@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
+import AuthLogoutButton from "@/components/shared/auth-logout-button";
 import { cn } from "@/lib/utils";
 
 export type AppMenuItem = {
@@ -21,6 +22,7 @@ type AppSidebarProps = {
   menuItems: AppMenuItem[];
   activePath?: string;
   user?: AppSidebarUser;
+  showLogout?: boolean;
   appName?: string;
   logo?: ReactNode;
   footer?: ReactNode;
@@ -31,6 +33,7 @@ export default function AppSidebar({
   menuItems,
   activePath,
   user,
+  showLogout = false,
   appName = "CineKU",
   logo,
   footer,
@@ -73,21 +76,24 @@ export default function AppSidebar({
       </nav>
 
       {user ? (
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.18)]">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/10 text-sm font-semibold text-white">
-              {user.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
-              ) : (
-                <span>{user.name.charAt(0).toUpperCase()}</span>
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-white">{user.name}</p>
-              <p className="truncate text-xs text-slate-300">@{user.username}</p>
+        <div className="space-y-3">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-4 shadow-[0_16px_40px_rgba(0,0,0,0.18)]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/10 text-sm font-semibold text-white">
+                {user.avatarUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={user.avatarUrl} alt={user.name} className="h-full w-full object-cover" />
+                ) : (
+                  <span>{user.name.charAt(0).toUpperCase()}</span>
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-white">{user.name}</p>
+                <p className="truncate text-xs text-slate-300">@{user.username}</p>
+              </div>
             </div>
           </div>
+          {showLogout ? <AuthLogoutButton /> : null}
         </div>
       ) : null}
 

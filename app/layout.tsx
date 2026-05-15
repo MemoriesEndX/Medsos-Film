@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import './globals.css'
 
+import AuthSessionProvider from '@/components/auth/session-provider'
+
 export const metadata: Metadata = {
   title: 'Cineku — Ruang Karya Film Indonesia',
   description: 'Platform digital untuk showcase, discovery, portfolio, dan kolaborasi filmmaker Indonesia.',
@@ -32,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-scroll-behavior="smooth">
       <body className="font-sans antialiased bg-slate-950 text-slate-100">
-        {children}
+        <AuthSessionProvider>{children}</AuthSessionProvider>
       </body>
     </html>
   );

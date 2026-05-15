@@ -1,7 +1,7 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { getRedirectPathByRole } from "@/src/lib/auth/redirect-by-role";
+import { getDashboardUrl } from "@/lib/auth/get-dashboard-url";
 
 const protectedRoutes = ["/home", "/admin", "/competition"] as const;
 
@@ -29,7 +29,7 @@ export async function proxy(request: NextRequest) {
   }
 
   const role = token.role;
-  const roleHome = getRedirectPathByRole(typeof role === "string" ? role : "USER");
+  const roleHome = getDashboardUrl({ role: typeof role === "string" ? role : "USER" });
 
   if (pathname.startsWith("/admin") && role !== "ADMIN") {
     return NextResponse.redirect(createRedirectUrl(roleHome, request));

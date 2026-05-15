@@ -41,13 +41,14 @@ export default async function CompetitionPage() {
       <AppSidebar
         activePath="/competition"
         menuItems={sidebarMenuItems}
+        showLogout
         user={{
           name: displayName,
           username: session.user.username,
           avatarUrl: session.user.image,
         }}
       />
-      <AppMobileNav activePath="/home" menuItems={mobileMenuItems} />
+      <AppMobileNav activePath="/home" menuItems={mobileMenuItems} showLogout />
 
       <section className="mx-auto w-full max-w-6xl px-5 py-10 sm:px-8">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-amber-200">Competition Dashboard</p>

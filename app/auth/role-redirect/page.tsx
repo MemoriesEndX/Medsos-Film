@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 import { authOptions } from "@/lib/auth";
-import { getRedirectPathByRole } from "@/src/lib/auth/redirect-by-role";
+import { getDashboardUrl } from "@/lib/auth/get-dashboard-url";
 
 export default async function RoleRedirectPage() {
   const session = await getServerSession(authOptions);
@@ -11,5 +11,5 @@ export default async function RoleRedirectPage() {
     redirect("/login");
   }
 
-  redirect(getRedirectPathByRole(session.user.role));
+  redirect(getDashboardUrl(session.user));
 }

@@ -2,11 +2,21 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
-import { Menu, X, Film } from 'lucide-react';
+import { Menu, X, Film, UserCircle } from 'lucide-react';
+
+import { getDashboardUrl } from '@/lib/auth/get-dashboard-url';
+import AuthLogoutButton from '@/components/shared/auth-logout-button';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === 'authenticated' && Boolean(session?.user);
+  const dashboardUrl = getDashboardUrl({
+    role: session?.user?.role,
+    username: session?.user?.username,
+  });
 
   const menuItems = [
     { label: 'Apa Itu Cineku', href: '#about' },
@@ -45,10 +55,31 @@ export default function Navbar() {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex gap-3">
-            <button className="px-6 py-2 rounded-lg bg-amber-500 text-slate-950 font-semibold hover:bg-amber-400 transition-colors">
-              Mulai Sekarang
-            </button>
+          <div className="hidden md:flex items-center gap-3">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href={dashboardUrl}
+                  className="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-5 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+                >
+                  {session?.user?.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={session.user.image} alt="" className="h-5 w-5 rounded-full object-cover" />
+                  ) : (
+                    <UserCircle className="h-5 w-5" aria-hidden="true" />
+                  )}
+                  Dashboard
+                </Link>
+                <AuthLogoutButton className="w-auto rounded-lg px-4 py-2" />
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="rounded-lg bg-amber-500 px-6 py-2 font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+              >
+                Login
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -73,9 +104,32 @@ export default function Navbar() {
                 {item.label}
               </Link>
             ))}
-            <button className="w-full mt-4 px-6 py-2 rounded-lg bg-amber-500 text-slate-950 font-semibold hover:bg-amber-400 transition-colors">
-              Mulai Sekarang
-            </button>
+            {isAuthenticated ? (
+              <div className="mt-4 space-y-3">
+                <Link
+                  href={dashboardUrl}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 px-6 py-2 font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {session?.user?.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={session.user.image} alt="" className="h-5 w-5 rounded-full object-cover" />
+                  ) : (
+                    <UserCircle className="h-5 w-5" aria-hidden="true" />
+                  )}
+                  Dashboard
+                </Link>
+                <AuthLogoutButton className="rounded-lg border-slate-700 bg-slate-900/80 py-2" />
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="mt-4 block w-full rounded-lg bg-amber-500 px-6 py-2 text-center font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+                onClick={() => setIsOpen(false)}
+              >
+                Login
+              </Link>
+            )}
           </div>
         )}
       </div>

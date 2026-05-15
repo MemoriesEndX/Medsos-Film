@@ -55,13 +55,14 @@ export default async function HomePage() {
       <AppSidebar
         activePath="/home"
         menuItems={getSidebarMenuItems(session.user.role)}
+        showLogout
         user={{
           name: displayName,
           username: session.user.username,
           avatarUrl: session.user.image,
         }}
       />
-      <AppMobileNav activePath="/home" menuItems={mobileMenuItems} />
+      <AppMobileNav activePath="/home" menuItems={mobileMenuItems} showLogout />
 
       <section className="mx-auto flex min-h-screen w-full max-w-6xl items-center px-5 py-10 sm:px-8">
         <div className="max-w-2xl">

@@ -91,6 +91,7 @@ export default async function CreatorProfilePage({ params }: CreatorPageProps) {
           username: data.user.username,
           avatarUrl: data.user.profilePhoto ?? data.user.image,
         }}
+        showLogout={Boolean(session)}
         appName="CineKU"
         logo={<Clapperboard className="h-5 w-5 text-amber-200" />}
       />
@@ -131,7 +132,7 @@ export default async function CreatorProfilePage({ params }: CreatorPageProps) {
         </div>
       </aside>
 
-      <AppMobileNav menuItems={menuItems} activePath={activePath} />
+      <AppMobileNav menuItems={menuItems} activePath={activePath} showLogout={Boolean(session)} />
     </main>
   );
 }
