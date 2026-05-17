@@ -86,7 +86,9 @@ export const authOptions: NextAuthOptions = {
           });
         }
 
-        return {
+        console.log(`[AUTHORIZE] Email: ${user.email}, DB Role: ${user.role}, Type: ${typeof user.role}`);
+
+        const returnUser = {
           id: user.id,
           name: user.name ?? user.username ?? user.email,
           email: user.email,
@@ -96,6 +98,10 @@ export const authOptions: NextAuthOptions = {
           accountType: user.accountType,
           professionRole: user.professionRole,
         };
+
+        console.log(`[AUTHORIZE] Returning user with role: ${returnUser.role}, Type: ${typeof returnUser.role}`);
+
+        return returnUser;
       },
     }),
   ],
@@ -120,8 +126,11 @@ export const authOptions: NextAuthOptions = {
           name: true,
           image: true,
           username: true,
+          role: true,
         },
       });
+
+      console.log(`[SIGNIN GOOGLE] Email: ${user.email}, Existing User: ${!!existingUser}, Existing Role: ${existingUser?.role}`);
 
       if (existingUser) {
         const updateData: { name?: string; image?: string; username?: string } = {};
@@ -145,6 +154,7 @@ export const authOptions: NextAuthOptions = {
           });
         }
       } else {
+        console.log(`[SIGNIN GOOGLE] Creating new user with email ${user.email}, will use default role`);
         await prisma.user.create({
           data: {
             email: user.email,
@@ -156,6 +166,7 @@ export const authOptions: NextAuthOptions = {
         });
       }
 
+      console.log(`[SIGNIN GOOGLE] SignIn callback returning true`);
       return true;
     },
     async jwt({ token, user }) {
@@ -176,6 +187,10 @@ export const authOptions: NextAuthOptions = {
         return token;
       }
 
+      console.log(`[JWT CALLBACK] Email: ${token.email}`);
+      console.log(`[JWT CALLBACK] DB User Role:`, { value: dbUser.role, type: typeof dbUser.role, json: JSON.stringify(dbUser.role) });
+      console.log(`[JWT CALLBACK] DB User Full:`, { email: dbUser.email, role: dbUser.role, username: dbUser.username, id: dbUser.id });
+
       token.id = dbUser.id;
       token.name = dbUser.name ?? dbUser.username ?? dbUser.email;
       token.username = dbUser.username ?? undefined;
@@ -185,6 +200,8 @@ export const authOptions: NextAuthOptions = {
       token.accountType = dbUser.accountType;
       token.professionRole = dbUser.professionRole;
 
+      console.log(`[JWT CALLBACK] Token Role After Assignment:`, { value: token.role, type: typeof token.role, json: JSON.stringify(token.role) });
+
       return token;
     },
     async session({ session, token }) {
@@ -192,27 +209,44 @@ export const authOptions: NextAuthOptions = {
         return session;
       }
 
+      console.log(`[SESSION CALLBACK START]`);
+      console.log(`[SESSION CALLBACK] Token Role Input:`, { value: token.role, type: typeof token.role, json: JSON.stringify(token.role) });
+
       session.user.id = token.id ?? token.sub ?? "";
       session.user.name = token.name ?? session.user.name;
       session.user.email = token.email ?? session.user.email;
       session.user.image = token.image ?? session.user.image;
       session.user.username = token.username ?? "";
-      session.user.role = token.role ?? "USER";
+      session.user.role = typeof token.role === "string" ? token.role : "USER";
       session.user.accountType = token.accountType ?? "PERSONAL";
       session.user.professionRole = token.professionRole ?? "OTHER";
+
+      console.log(`[SESSION CALLBACK] Session Role After Assignment:`, { value: session.user.role, type: typeof session.user.role, json: JSON.stringify(session.user.role) });
+      console.log(`[SESSION CALLBACK] Full session.user:`, { id: session.user.id, email: session.user.email, role: session.user.role, username: session.user.username, accountType: session.user.accountType });
+
+      if (process.env.NODE_ENV === "development") {
+        console.log("SESSION ROLE:", session.user.role);
+      }
 
       return session;
     },
     async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) {
-        return `${baseUrl}${url}`;
+      const resolvedUrl = url.startsWith("/") ? new URL(url, baseUrl) : new URL(url);
+
+      if (resolvedUrl.origin !== baseUrl) {
+        return baseUrl;
       }
 
-      if (new URL(url).origin === baseUrl) {
-        return url;
+      // Force protected destinations through role resolver so callbackUrl never bypasses role mapping.
+      if (
+        resolvedUrl.pathname.startsWith("/admin") ||
+        resolvedUrl.pathname.startsWith("/competition") ||
+        resolvedUrl.pathname.startsWith("/home")
+      ) {
+        return `${baseUrl}/auth/role-redirect`;
       }
 
-      return baseUrl;
+      return resolvedUrl.toString();
     },
   },
   secret: process.env.AUTH_SECRET,

@@ -1,18 +1,16 @@
-export function getDashboardUrl(user: {
-  role?: string | null;
-  username?: string | null;
-}): string {
-  if (user.role === "ADMIN") {
-    return "/admin";
+export function getDashboardUrlByRole(role?: string | null) {
+  switch (role) {
+    case "ADMIN":
+      return "/admin";
+    case "CREATOR":
+    case "COMPETITION_JUDGE":
+      return "/competition";
+    case "USER":
+    default:
+      return "/home";
   }
+}
 
-  if (user.role === "COMPETITION_JUDGE") {
-    return "/competition";
-  }
-
-  if (user.role === "CREATOR" && user.username) {
-    return `/creator/${user.username}`;
-  }
-
-  return "/home";
+export function getDashboardUrl(user: { role?: string | null; username?: string | null }): string {
+  return getDashboardUrlByRole(user.role);
 }

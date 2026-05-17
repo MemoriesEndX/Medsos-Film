@@ -5,6 +5,7 @@ import { Bell, Film, Home, Search, Settings, ShieldCheck, Upload, User, Users, B
 import AppMobileNav from "@/components/shared/app-mobile-nav";
 import AppSidebar from "@/components/shared/app-sidebar";
 import { authOptions } from "@/lib/auth";
+import { getDashboardUrlByRole } from "@/lib/auth/get-dashboard-url";
 
 const mobileMenuItems = [
   { label: "Home", href: "/home", icon: Home },
@@ -31,7 +32,7 @@ export default async function AdminPage() {
   }
 
   if (session.user.role !== "ADMIN") {
-    redirect("/home");
+    redirect(getDashboardUrlByRole(session.user.role));
   }
 
   const displayName = session.user.name ?? session.user.username ?? "Admin";

@@ -1,7 +1,7 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { getDashboardUrl } from "@/lib/auth/get-dashboard-url";
+import { getDashboardUrlByRole } from "@/lib/auth/get-dashboard-url";
 
 const protectedRoutes = ["/home", "/admin", "/competition"] as const;
 
@@ -28,17 +28,25 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const role = token.role;
-  const roleHome = getDashboardUrl({ role: typeof role === "string" ? role : "USER" });
+  const role = typeof token.role === "string" ? token.role : "USER";
+  const roleHome = getDashboardUrlByRole(role);
+  const isAdmin = role === "ADMIN";
+  const isCompetitionRole = role === "CREATOR" || role === "COMPETITION_JUDGE";
 
-  if (pathname.startsWith("/admin") && role !== "ADMIN") {
+  console.log(`[PROXY] Pathname: ${pathname}, Token Role: ${token.role}, Resolved Role: ${role}, Type: ${typeof role}`);
+  console.log(`[PROXY] isAdmin: ${isAdmin}, isCompetitionRole: ${isCompetitionRole}, roleHome: ${roleHome}`);
+
+  if (pathname.startsWith("/admin") && !isAdmin) {
+    console.log(`[PROXY] User role ${role} not ADMIN, redirecting to ${roleHome}`);
     return NextResponse.redirect(createRedirectUrl(roleHome, request));
   }
 
-  if (pathname.startsWith("/competition") && role !== "COMPETITION_JUDGE") {
+  if (pathname.startsWith("/competition") && !isCompetitionRole) {
+    console.log(`[PROXY] User role ${role} not COMPETITION_JUDGE/CREATOR, redirecting to ${roleHome}`);
     return NextResponse.redirect(createRedirectUrl(roleHome, request));
   }
 
+  console.log(`[PROXY] Access allowed for role ${role} to ${pathname}`);
   return NextResponse.next();
 }
 

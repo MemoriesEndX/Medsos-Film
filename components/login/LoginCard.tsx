@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { Camera, Clapperboard, Film, Sparkles, Ticket } from "lucide-react";
 
 import GoogleLoginButton from "@/components/login/GoogleLoginButton";
-import { getDashboardUrl } from "@/lib/auth/get-dashboard-url";
+import { getDashboardUrlByRole } from "@/lib/auth/get-dashboard-url";
 
 export default function LoginCard() {
   const router = useRouter();
@@ -40,7 +40,7 @@ export default function LoginCard() {
       const session = await getSession();
       const role = session?.user?.role ?? "USER";
 
-      router.replace(getDashboardUrl({ role, username: session?.user?.username }));
+      router.replace(getDashboardUrlByRole(role));
       router.refresh();
     } finally {
       setIsSubmitting(false);

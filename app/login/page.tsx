@@ -1,8 +1,19 @@
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+
+import { authOptions } from "@/lib/auth";
+import { getDashboardUrlByRole } from "@/lib/auth/get-dashboard-url";
 import LoginCard from "../../components/login/LoginCard";
 import LoginDecorations from "../../components/login/LoginDecorations";
 import LoginHeroText from "../../components/login/LoginHeroText";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await getServerSession(authOptions);
+
+  if (session?.user) {
+    redirect(getDashboardUrlByRole(session.user.role));
+  }
+
   return (
     <main className="relative isolate min-h-screen overflow-hidden bg-linear-to-br from-slate-950 via-[#12121b] to-slate-900 px-4 py-8 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">

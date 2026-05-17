@@ -6,17 +6,14 @@ import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { Menu, X, Film, UserCircle } from 'lucide-react';
 
-import { getDashboardUrl } from '@/lib/auth/get-dashboard-url';
+import { getDashboardUrlByRole } from '@/lib/auth/get-dashboard-url';
 import AuthLogoutButton from '@/components/shared/auth-logout-button';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { data: session, status } = useSession();
   const isAuthenticated = status === 'authenticated' && Boolean(session?.user);
-  const dashboardUrl = getDashboardUrl({
-    role: session?.user?.role,
-    username: session?.user?.username,
-  });
+  const dashboardUrl = getDashboardUrlByRole(session?.user?.role);
 
   const menuItems = [
     { label: 'Apa Itu Cineku', href: '#about' },

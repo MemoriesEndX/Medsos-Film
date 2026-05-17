@@ -5,6 +5,7 @@ import { Bell, ClipboardList, Film, Home, Search, Star, Trophy, Upload, User } f
 import AppMobileNav from "@/components/shared/app-mobile-nav";
 import AppSidebar from "@/components/shared/app-sidebar";
 import { authOptions } from "@/lib/auth";
+import { getDashboardUrlByRole } from "@/lib/auth/get-dashboard-url";
 
 const mobileMenuItems = [
   { label: "Home", href: "/home", icon: Home },
@@ -30,8 +31,8 @@ export default async function CompetitionPage() {
     redirect("/login");
   }
 
-  if (session.user.role !== "COMPETITION_JUDGE") {
-    redirect(session.user.role === "ADMIN" ? "/admin" : "/home");
+  if (session.user.role !== "COMPETITION_JUDGE" && session.user.role !== "CREATOR") {
+    redirect(getDashboardUrlByRole(session.user.role));
   }
 
   const displayName = session.user.name ?? session.user.username ?? "Judge";
